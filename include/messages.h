@@ -1,27 +1,17 @@
-/*************************************************************************
-  File        : Messages.h
-  Description : Message definition file
-*************************************************************************/
+/**
+ * @file messages.h
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2021-12-27
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 
 #include <Arduino.h>
 #include <MessageParser.h>
 #include <time.h>
-
-/**
- * MESSAGES:
- * 
- *  *IDN?   - Identity
- *  *ECHO   - Echo Data
- *  *STS?   - Query Available States
- *  *RST    - Reset
- *  *TST?   - Self-Test
- *  *ERR?   - Error
- *  *AST    - Assert Error
- *  *CLR    - Clear Error Status
- *  *TIME?  - Query Current Time
- *  *SYNC   - Syncrhonise Time Clock
- * 
- **/
 
 /**
  * @brief Process a stream message and call an appropriate action if message valid
@@ -29,26 +19,38 @@
  * @details Calls a subfunction based on the state information of the incoming message.
  * Included data in the incoming message can be used to customise the action taken.
  * 
- * State        | Description       | Data         | Example      |
- * ------------ | ----------------- | ------------ | ------------ |
- * *IDN?        | Identity Query    |              |              |
- * *ECHO
- * *TST
- * *ERR?
- * *AST
- * *CLR?
+ * State  | Description       | Data                | Example                    |
+ * ------ | ----------------- | ------------------- | -------------------------- |
+ * *IDN?  | Identity Query    |                     |                            |
+ * *ECHO  | Echo String       | *Anything*          |                            |
+ * *RST   | Software Reset    |                     |                            |
+ * *TST   | Perform Self-Test |                     |                            |
+ * *ERR?  | Query Error       |                     |                            |
+ * *AST   | Assert Error      |                     |                            |
+ * *CLR?  | Clear Error       |                     |                            |
+ * *SYNC  | Synchronise Time  | yyyy-mm-dd,HH:MM:SS | *TIME::2021-12-27,12:21:22 |
+ * *TIME? | Query Time        |                     |                            |
+ * *BAUD  | Set BAUD rate     | BAUD Rate           | *BAUD::115200              |
+ * *BAUD? | Query BAUD rate   |                     |                            |
  * 
  * @param STREAM Communication stream (Serial/I2C/Ethernet/FileIO)
  * @param MESSAGE Message to parse (MESSAGE.state & MESSAGE.data[])
  */
-void handleMessage(Stream &STREAM, Message MESSAGE) {
-
-  /*************************************************************************
-    State       : *IDN?
-    Parameters  : -
-    Description : Queries the hardware and software ID
-  *************************************************************************/
-  if (MESSAGE.state == "*idn?") {
+void handleMessage(Stream &STREAM, Message MESSAGE) 
+{
+ 
+  /**
+   * ***
+   * @par *IDN?
+   * 
+   * @details This command queries the board information including software version
+   * and build time and the hardware ID. 
+   * 
+   * @return idn "SOFTWARE_ID | COMPANY_ID | Serial: xx-xx-xx-xx-xx | Version: x.x.x | MCU: MODEL | BUILD: *cTime*"
+   * 
+   */
+  if (MESSAGE.state == "*idn?") 
+  {
     #if defined BOARD_ATMEL
       time_t buildTime = BUILD_TIME - 946684800;
     #else
@@ -57,31 +59,47 @@ void handleMessage(Stream &STREAM, Message MESSAGE) {
     STREAM.println(SOFTWARE_ID + " | " + COMPANY_ID + " | Serial: " + getHardwareID() + " | Version: " + String(SOFTWARE_VERSION_MAJOR, HEX) + "." + String(SOFTWARE_VERSION_MINOR, HEX) + "." + String(SOFTWARE_VERSION_FIX, HEX) + " | MCU: " + BOARD_MODEL + " | Build: " + ctime(&buildTime));
   } 
 
-  /*************************************************************************
-    State       : *ECHO
-    Parameters  : -
-    Description : Instructs the target to echo the message data[0]
-  *************************************************************************/
-  else if (MESSAGE.state == "*echo") {
+  /**
+   * ***
+   * @par *ECHO
+   * 
+   * @details This command instructs the board to echo a string sent as the data
+   * portion of the message
+   * 
+   * @param echo_data *Anything*
+   * 
+   * @return *Anything*
+   * 
+   */
+  else if (MESSAGE.state == "*echo") 
+  {
     STREAM.println(MESSAGE.data[0]);
   } 
 
-  /*************************************************************************
-    State       : *RST
-    Parameters  : -
-    Description : Software resets the microcontroller
-  *************************************************************************/
-  else if (MESSAGE.state == "*rst") {
+  /**
+   * ***
+   * @par *RST
+   * 
+   * @details Instructs the board to perform a software reset which will also close
+   * the current STREAM connection so no response is provided
+   * 
+   */
+  else if (MESSAGE.state == "*rst") 
+  {
     // perform target specific reset
   } 
 
-  /*************************************************************************
-    State       : *TST?
-    Parameters  : -
-    Description : Instruct the system to perform a self-test and report
-                  the system status
-  *************************************************************************/
-  else if (MESSAGE.state == "*tst?") {
+  /**
+   * ***
+   * @par *TST
+   * 
+   * @details Instructs the board to perform a self-test and reporst the status
+   * 
+   * @return status "PASS" or "FAIL"
+   * 
+   */
+  else if (MESSAGE.state == "*tst") 
+  {
     STREAM.println(String("Performing Self Test..."));
     digitalWrite(LED_BUILTIN, HIGH);
     delay(1000);
@@ -90,39 +108,56 @@ void handleMessage(Stream &STREAM, Message MESSAGE) {
     else {STREAM.println(String("PASS"));}
   } 
 
-  /*************************************************************************
-    State       : *ERR?
-    Parameters  : -
-    Description : Queries the system for the current error code
-  *************************************************************************/
-  else if (MESSAGE.state == "*err?") {
+  /**
+   * ***
+   * @par *ERR?
+   * 
+   * @details Queries the board for the current error code (0: NO ERROR)
+   * 
+   * @return error_code 
+   * 
+   */
+  else if (MESSAGE.state == "*err?") 
+  {
     STREAM.println(String(SYSTEM_ERROR));
   } 
 
-  /*************************************************************************
-    State       : *AST
-    Parameters  : -
-    Description : Assert a system error which can be used for code testing
-  *************************************************************************/
-  else if (MESSAGE.state == "*ast") {
+  /**
+   * ***
+   * @par *AST
+   * 
+   * @details Assert an error which can be used for testing error handling code
+   * 
+   */
+  else if (MESSAGE.state == "*ast") 
+  {
     SYSTEM_ERROR = ASSERT_ERROR;
   } 
 
-  /*************************************************************************
-    State       : *CLR
-    Parameters  : -
-    Description : Clears the current system error and return to 0
-  *************************************************************************/
-  else if (MESSAGE.state == "*clr") {
+  /**
+   * ***
+   * @par *CLR
+   * 
+   * @details Clears the current error code on the board, this should return the board
+   * to normal operating mode
+   * 
+   */
+  else if (MESSAGE.state == "*clr") 
+  {
     SYSTEM_ERROR = NO_ERROR;
   } 
 
-  /*************************************************************************
-    State       : -
-    Parameters  : -
-    Description : Invalid STATE called produce system error (2)
-  *************************************************************************/
-  else {
+  /**
+   * ***
+   * @par UNKNOWN_STATE_CALLED
+   * 
+   * @details If an unknown state is called the board will generate an error
+   * 
+   * @return response "ERROR::UNKNOWN_STATE_CALLED"
+   * 
+   */
+  else 
+  {
     SYSTEM_ERROR = UNKNOWN_STATE_CALLED;
     STREAM.println("ERROR::UNKNOWN_STATE_CALLED");
   }
@@ -134,9 +169,11 @@ void handleMessage(Stream &STREAM, Message MESSAGE) {
  * @param STREAM Communication stream (Serial/I2C/Ethernet/FileIO)
  * @return String Byte stream
  */
-String readStream(Stream &STREAM) {
+String readStream(Stream &STREAM) 
+{
   String inputStream = "";
-  while (STREAM.available()) {
+  while (STREAM.available()) 
+  {
     char inChar = (char)STREAM.read();
     inputStream += inChar;
   }
@@ -157,9 +194,11 @@ MessageParser uart_comms;
  * @details Provides serial interrupt-style reading of incoming bytes
  * 
  */
-void serialEvent() {
+void serialEvent() 
+{
   Message currentMessage = uart_comms.parse(readStream(Serial));
-  if (currentMessage.state != "") {
+  if (currentMessage.state != "") 
+  {
     handleMessage(Serial, currentMessage);
     currentMessage.state = "";
   }

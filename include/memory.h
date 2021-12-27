@@ -17,6 +17,7 @@
  * @details These are the core device settings that get loaded during the setup phase
  * 
  */
-struct Memory {
+struct Memory 
+{
   uint32_t BAUD_RATE = 115200;
 } DeviceSettings;

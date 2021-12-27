@@ -1,0 +1,9 @@
+
+This directory is intended for pre and post build scripts to be ran by the PlatformIO core.
+
+If there is a requirement to dynamically change a definition pre build or a post action needs to be taken after building this can be done using Python scripts included in this folder.
+
+In order to enable these scripts please modify the platformio.ini file
+
+More information about Doxygen:
+- https://docs.platformio.org/en/latest/projectconf/advanced_scripting.html

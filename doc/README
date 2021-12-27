@@ -1,0 +1,8 @@
+
+This directory is intended for documentation files and the Doxygen configuration file.
+
+Running "generate.cmd" from VSCode will result in the Doxyfile configuration 
+being used to generate HTML documentation based on the comments found in source code.
+
+More information about Doxygen:
+- https://www.doxygen.nl/index.html

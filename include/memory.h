@@ -10,6 +10,7 @@
  */
 
 #include <Arduino.h>
+#include "EEPROManager.h"
 
 /**
  * @brief Device Settings
@@ -17,7 +18,10 @@
  * @details These are the core device settings that get loaded during the setup phase
  * 
  */
-struct Memory 
+struct Settings 
 {
   uint32_t BAUD_RATE = 115200;
+  uint8_t DEBUG = 0;
 } DeviceSettings;
+
+EEPROManager<Settings> manageDeviceSettings(&DeviceSettings, 0x0001);

@@ -11,3 +11,6 @@ doxygen doc\Doxyfile
 
 rem When complete launch the browser and show index.html
 start doc\.doxygen\html\index.html
+
+rem Note: if you receive the error "'doxygen' is not recognized as an internal or external command, operable program or batch file":
+rem Ensure you include the doxygen "bin" folder to the Windows "PATH" environment variables

@@ -20,11 +20,12 @@
  * @brief Initial Setup
  * 
  * @details When the device is booted the following actions are performed:
- *  -# Device memory is read for device settings
- *  -# Serial communication is begun at desired baud rate defined by device settings
+ *  -# Set the built-in LED pin to OUTPUT
+ *  -# Serial communication is begun at BAUD rate defined by DeviceSettings
  * 
  */
-void setup() {
+void setup() 
+{
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(DeviceSettings.BAUD_RATE);
 }
@@ -32,9 +33,15 @@ void setup() {
 /**
  * @brief Main Application Loop
  * 
- * @details Provide details of how the main application loop is configured and expected actions
+ * @details Once setup is complete, the following actions are peformed repetatively:
+ *  -# Toggle the built-in LED
+ *  -# EEPROManager updates EEPROM with new DeviceSettings if changed (print response if in DEBUG mode)
+ *  -# Delay for 0.5 second
  * 
  */
-void loop() {
-  //
+void loop() 
+{
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  if (uint8_t COUNT = manageDeviceSettings.update() && DeviceSettings.DEBUG) { Serial.println("EEPROM Managed: " + String(COUNT)); }
+  delay(500);
 }

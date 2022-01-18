@@ -15,3 +15,4 @@ String SOFTWARE_ID = "microPlatform";
 String COMPANY_ID = "PCLabTools";
 
 uint16_t SYSTEM_ERROR = NO_ERROR;
+

@@ -34,3 +34,11 @@
  * 
  */
 #define UNKNOWN_STATE_CALLED                        0x0002
+
+/**
+ * @brief EEPROM_DATA_INVALID
+ * 
+ * @details While reading the EEPROM an error occured
+ * 
+ */
+#define EEPROM_DATA_INVALID                         0x0003

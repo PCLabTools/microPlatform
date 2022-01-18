@@ -28,11 +28,14 @@
     idString.remove(idString.length()-1);
     return idString;
   }
+  void(* resetFunc) (void) = 0;
 #endif
 
 #if defined BOARD_ARM
   #include <TeensyID.h>
-  String getHardwareID() {
+  String getHardwareID() 
+  {
     return teensySN();
   }
+  void resetFunc() { _reboot_Teensyduino_(); }
 #endif
